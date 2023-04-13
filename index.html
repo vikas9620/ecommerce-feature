@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Contact App</title>
+  </head>
+  <style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    color: #333;
+    padding: 20px;
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  form {
+    max-width: 400px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  input[type="text"],
+  input[type="number"]
+   {
+    width: 100%;
+    padding: 10px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+  }
+  
+  button[type="submit"] {
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  h2{
+    text-align: center;
+    margin-top: 40px;
+  }
+  
+  #productList {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 400px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+#total-price{
+    text-align: center;
+    margin-top: 40px;
+}
+
+
+
+.deleteBtn {
+  background-color: #f44336;
+  color: #fff;
+}
+
+
+</style>
+  <body>
+    
+    <form id="productForm">
+      <label for="price">Product Price:</label>
+      <input type="number" id="price" name="number" required />
+
+      <label for="name">Product Name:</label>
+      <input type="text" id="name" name="name" required />
+
+    <button type="submit">Add Product</button>
+  </form>
+
+    <h2>Product List</h2>
+    <div id="productList"></div>
+  
+    <div id="total-price">Total Price: <span>$</span></div>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+  const apiEndpoint = "https://crudcrud.com/api/39e2973b3f20499ab572a7fd41ccced6/products";
+  const product = document.querySelector("#productForm");
+  const nameInput = document.querySelector("#name");
+  const priceInput = document.querySelector("#price");
+  const totalPriceInput = document.querySelector("#totalPrice");
+  const productList = document.querySelector("#productList");
+
+  let products = [];
+
+  async function renderProducts() {
+    productList.innerHTML = "";
+
+    products.forEach((product) => {
+      const product1 = document.createElement("div");
+      product1.innerHTML = `
+      <div id="productt">
+        <div id="product-form">
+        <p>Product Name: ${product.name}<p>
+        <p>Product price: ${product.price}</p>
+        <button class="deleteBtn" data-id="${product._id}">Delete</button>
+      </div>
+    </div>
+      `;
+      productList.appendChild(product1);
+    });
+
+   
+    updateTotalPrice()
+    const deleteBtns = document.querySelectorAll(".deleteBtn");
+    deleteBtns.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const productId = e.target.dataset.id;
+        deleteProduct(productId);
+      });
+    });
+  }
+
+
+  async function getProducts() {
+    try {
+      const response = await axios.get(apiEndpoint);
+      contacts = response.data;
+      renderProducts();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function createProduct(name, price) {
+    try {
+      const response = await axios.post(apiEndpoint, {
+        name,
+        price
+      });
+      products.push(response.data);
+      renderProducts();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  
+  
+
+// Delete a contact from the server
+async function deleteProduct(productId) {
+  try {
+    await axios.delete(`https://crudcrud.com/api/39e2973b3f20499ab572a7fd41ccced6/products/${productId}`);
+    await loadProducts();
+  } catch (error) {
+    console.error(error);
+  }
+}
+async function deleteProduct(productId) {
+  try {
+    await axios.delete(`${apiEndpoint}/${productId}`);
+    products = products.filter(product => product._id !== productId);
+    renderProducts();
+  } catch (error) {
+    console.error(error);
+  }
+}  
+function updateTotalPrice() {
+  const totalPriceElement = document.querySelector("#total-price");
+  let totalPrice = 0;
+  if (products.length > 0) {
+    totalPrice = products.reduce((sum, product) => sum + parseFloat(product.price), 0);
+    console.log(totalPrice);
+  }
+  totalPriceElement.textContent = `Total Price: $${totalPrice}`;
+}
+// Handle form submission
+const productForm = document.querySelector("form");
+productForm.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const name = document.getElementById("name").value;
+  const price = document.getElementById("price").value;
+  const product = { name, price};
+
+  await createProduct(product.name, product.price);
+
+
+  // Reset the form
+  productForm.reset();
+  document.getElementById("name").focus();
+});
+
+// Load the initial contact list
+getProducts();
+
+      </script>
+
+
+
+
+
+
+  </body>
+</html>
