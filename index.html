@@ -81,7 +81,7 @@
 
 </style>
   <body>
-    
+    <h1>Products</h1>
     <form id="productForm">
       <label for="price">Product Price:</label>
       <input type="number" id="price" name="number" required />
@@ -95,17 +95,16 @@
     <h2>Product List</h2>
     <div id="productList"></div>
   
-    <div id="total-price">Total Price: <span>$</span></div>
+    <div id="total-price"></div>
 
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
-  const apiEndpoint = "https://crudcrud.com/api/39e2973b3f20499ab572a7fd41ccced6/products";
+  const apiEndpoint = "https://crudcrud.com/api/bb71dffa4b944722a167ebfb74e3f318/products";
   const product = document.querySelector("#productForm");
   const nameInput = document.querySelector("#name");
   const priceInput = document.querySelector("#price");
-  const totalPriceInput = document.querySelector("#totalPrice");
   const productList = document.querySelector("#productList");
-
+  
   let products = [];
 
   async function renderProducts() {
@@ -140,7 +139,7 @@
   async function getProducts() {
     try {
       const response = await axios.get(apiEndpoint);
-      contacts = response.data;
+      products = response.data;
       renderProducts();
     } catch (error) {
       console.error(error);
@@ -160,18 +159,8 @@
     }
   }
 
-  
-  
 
-// Delete a contact from the server
-async function deleteProduct(productId) {
-  try {
-    await axios.delete(`https://crudcrud.com/api/39e2973b3f20499ab572a7fd41ccced6/products/${productId}`);
-    await loadProducts();
-  } catch (error) {
-    console.error(error);
-  }
-}
+
 async function deleteProduct(productId) {
   try {
     await axios.delete(`${apiEndpoint}/${productId}`);
@@ -190,7 +179,7 @@ function updateTotalPrice() {
   }
   totalPriceElement.textContent = `Total Price: $${totalPrice}`;
 }
-// Handle form submission
+
 const productForm = document.querySelector("form");
 productForm.addEventListener("submit", async event => {
   event.preventDefault();
@@ -202,13 +191,15 @@ productForm.addEventListener("submit", async event => {
   await createProduct(product.name, product.price);
 
 
-  // Reset the form
+
   productForm.reset();
   document.getElementById("name").focus();
 });
 
-// Load the initial contact list
-getProducts();
+
+window.addEventListener('load', () => {
+  getProducts();
+});
 
       </script>
 
